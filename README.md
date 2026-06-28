@@ -1,194 +1,199 @@
-================== МОДУЛЬ 3: ФОРМИ ТА ЕФЕКТИ ============
+<!-- ================================================ -->
+<!-- additional npm install -->
+<!-- ================================================ -->
 
-====================== Домашнє завдання №3 ==============
+https://tanstack.com/query/latest
 
-1. Створено репозиторій 03-react-movies
-2. При здачі роботи надаються два посилання: на вихідні файли (репозиторій) та на робочу сторінку завдання, розгорнуту на Vercel.
-3. Проєкт створено за допомогою Vite.
-4. Під час запуску коду в консолі не повинно бути помилок або попереджень.
-5. Для кожного компонента у папці src/components має бути окрема папка, яка містить файл самого React компонента та файл його стилів. Назва папки, файлу компонента (з розширенням .tsx) та файлу стилів (перед .module.css) однакова і відповідає назвам, вказаним у завданнях (якщо вони були).
+<!-- npm i @tanstack/react-query -->
 
-6. У кожній папці компонента мають бути:
+ESLint Plugin Query
 
-6.1. файл компонента з розширенням .tsx (наприклад, App.tsx);
-6.2. файл стилів, назва якого закінчується на .module.css, з такою самою назвою (наприклад, App.module.css).
+<!-- npm i -D @tanstack/eslint-plugin-query -->
 
-7. Для експорту компонентів використовується експорт за замовчуванням (export default).
-8. Загальні типи, які використовуються в кількох компонентах, винесені в окремий файл (src/types/movie.ts). Типи та 9. інтерфейси, які стосуються лише одного компонента, оголошені безпосередньо у файлі цього компонента.
-9. Для типізації пропсів компонентів використовується interface.
-10. Інтерфейс для пропсів компонента називається за схемою: Ім’яКомпонентаProps (наприклад, UserCardProps).
-11. Усі події компонентів типізовані.
-12. Для виконання HTTP-запитів використовується бібліотека axios.
-13. TypeScript-код має бути чистим, зрозумілим і відформатованим за допомогою Prettier.
-14. Стилізація виконується за допомогою CSS-модулів.
-15. Використовується modern-normalize для уніфікації стилів у різних браузерах.
+Бібліотека react-paginate у Vite версії 8+(специфіка)
 
-Після змін, які вносите у своєму репозиторії, почекайте, будь ласка, 5 хвилин перед відправкою роботи на перевірку. Адже гіт хабу необхідний час, щоб оновити версію
+<!-- npm i react-paginate -->
 
-====================== Пошук фільмів ========
+<!-- bash
+<!-- npm install
+@tanstack/react-query axios react-hot-toast react-paginate modern-normalize -->
+<!-- npm install
+-D @types/react-paginate @tanstack/react-query-devtools prettier --> -->
 
-Напиши застосунок пошуку фільмів за ключовим словом. Подивіться демо-відео роботи застосунку.
-Сервіс пошуку фільмів TMDB (https://developer.themoviedb.org/docs/getting-started)
-У цьому завданні, за допомогою HTTP-запитів, ви будете отримувати інформацію про фільми з сервісу TMDB.
-Не зберігайте токен доступу в коді, використовуй для цього змінну оточення VITE_TMDB_TOKEN.
+======= МОДУЛЬ 4: React Query, Бібліотека Formik ========
+====================== Домашнє завдання №4 ==============
 
-Щоб додати токен авторизації до Axios-запиту, потрібно вказати його у заголовках (headers) під час виклику методів axios. Твій config object для аксіоса буде виглядати наступним чином:
+Створено репозиторій 04-react-query
+При здачі роботи надаються два посилання: на вихідні файли (репозиторій) та на робочу сторінку завдання, розгорнуту на Vercel.
+Проєкт створено за допомогою Vite.
+Під час запуску коду в консолі не повинно бути помилок або попереджень.
+Для кожного компонента у папці src/components має бути окрема папка, яка містить файл самого React компонента та файл його стилів. Назва папки, файлу компонента (з розширенням .tsx) та файлу стилів (перед .module.css) однакова і відповідає назвам, вказаним у завданнях (якщо вони були).
+У кожній папці компонента мають бути:
+Файл компонента з розширенням .tsx (наприклад, App.tsx);
+Файл стилів, назва якого закінчується на .module.css, з такою самою назвою (наприклад, App.module.css).
+Для експорту компонентів використовується експорт за замовчуванням (export default).
+Загальні типи, які використовуються в кількох компонентах, винесені в окремий файл (src/types/movie.ts). Типи та інтерфейси, які стосуються лише одного компонента, оголошені безпосередньо у файлі цього компонента.
+Для типізації пропсів компонентів використовується interface.
+Інтерфейс для пропсів компонента називається за схемою: Ім’яКомпонентаProps (наприклад, UserCardProps).
+Усі події компонентів типізовані.
+Для виконання HTTP-запитів використовується бібліотека axios.
+TypeScript-код має бути чистим, зрозумілим і відформатованим за допомогою Prettier.
+Стилізація виконується за допомогою CSS-модулів.
+Використовується modern-normalize для уніфікації стилів у різних браузерах.
 
-<!-- {
-  params: {
-    // твої параметри
-  },
-  headers: {
-    Authorization: `Bearer твійТокен`,
-  }
-} -->
+==================== Пошук фільмів ====================
 
-Відповідь від бекенда приходить об'єктом із всією необхідною інформацією, в тому числі масивом фільмів. Кожен фільм в масиві представлений об'єктом із великою кількістю інформації.
+Доповни свій застосунок пошуку фільмів пагінацією. Подивіться демо-відео роботи застосунку.
 
-Ось як буде виглядати інтерфейс для типізації одного фільму. Винесіть його у файл src/types/movie.ts і використовуйте у компонентах.
+Для збереження колекції відповідей від бекенду та керування станом запитів використовуйте бібліотеку TanStack Query.
 
-<!-- export interface Movie {
-    id: number;
-    poster_path: string;
-    backdrop_path: string;
-    title: string;
-    overview: string;
-    release_date: string;
-    vote_average: number;
-} -->
+<!-- https://tanstack.com/query/latest -->
 
-Функцію fetchMovies для виконання HTTP-запитів винесіть в окремий файл src/services/movieService.ts. Типізуйте її параметри, результат, який вона повертає, та відповідь від Axios.
+Installation:
 
-====================== Компоненти ========
+<!-- npm i @tanstack/react-query -->
 
-У цьому завданні вам потрібно самостійно створити та реалізувати логіку наступних компонентів.
-Стилі для всіх компонентів вже створені. Скопіюй їх із цього репозиторію: https://github.com/goitacademy/react-movies-styles. Після створення своїх компонентів скопіюй відповідні .module.css файли у відповідні папки в src/components.
+Recommendations# :
+It is recommended to also use our ESLint Plugin Query to help you catch bugs and inconsistencies while you code. You can install it via:
 
-====================== Хедер з формою пошуку SearchBar ========
+<!-- npm i -D @tanstack/eslint-plugin-query -->
 
-Компонент SearchBar приймає один пропс onSubmit – функцію для передачі значення інпуту під час сабміту форми.
-Компонент SearchBar має створювати DOM-елемент наступної структури:
+------------ Налаштування DevTools -----------
 
-<!-- <header className={styles.header}>
-  <div className={styles.container}>
-    <a
-      className={styles.link}
-      href="https://www.themoviedb.org/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Powered by TMDB
-    </a>
-    <form className={styles.form}>
-      <input
-        className={styles.input}
-        type="text"
-        name="query"
-        autoComplete="off"
-        placeholder="Search movies..."
-        autoFocus
-      />
-      <button className={styles.button} type="submit">
-        Search
+React Query Devtools – це потужний інструмент для моніторингу і налагодження запитів та кешування в реальному часі. Він дозволяє переглядати запити, їхні стани, дані, помилки та багато іншого прямо в браузері.
+Щоб додати DevTools, спершу потрібно його встановити:
+
+<!-- npm install @tanstack/react-query-devtools -->
+
+Необхідно зробити рефакторинг логіки отримання і збереження фільмів, а також відповідних станів. Не забудь, що налаштування роботи клієнта react-query потрібно робити на верхньому рівні, тобто у файлі src/main.tsx, а використовувати відповідні хуки безпосередньо в тому компоненті, де необхідна обробка отриманих даних – у нашому випадку, у компоненті App.
+
+<!-- import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+import { getTodos, postTodo } from '../my-api'
+
+// Create a client
+const queryClient = new QueryClient()
+
+function App() {
+  return (
+    // Provide the client to your App
+    <QueryClientProvider client={queryClient}>
+      <Todos />
+    </QueryClientProvider>
+  )
+}
+
+function Todos() {
+  // Access the client
+  const queryClient = useQueryClient()
+
+  // Queries
+  const query = useQuery({ queryKey: ['todos'], queryFn: getTodos })
+
+  // Mutations
+  const mutation = useMutation({
+    mutationFn: postTodo,
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['todos'] })
+    },
+  })
+
+  return (
+    <div>
+      <ul>
+        {query.data?.map((todo) => (
+          <li key={todo.id}>{todo.title}</li>
+        ))}
+      </ul>
+
+      <button
+        onClick={() => {
+          mutation.mutate({
+            id: Date.now(),
+            title: 'Do Laundry',
+          })
+        }}
+      >
+        Add Todo
       </button>
-    </form>
-  </div>
-</header> -->
+    </div>
+  )
+}
 
-Обробка форми має бути реалізована через Form Actions.
-Якщо під час натискання кнопки відправки форми текстове поле порожнє, покажіть користувачеві сповіщення про те, що необхідно ввести текст для пошуку зображень.
+render(<App />, document.getElementById('root')) -->
 
-<!-- Please enter your search query. -->
+==================== Пагінація фільмів ====================
 
-Ця перевірка виконується в SearchBar в момент відправки форми. Для сповіщень використовуйте бібліотеку React Hot Toast.
-Якщо в результаті запиту масив фільмів порожній, виводьте повідомлення:
+Сервіс TMDB підтримує пагінацію, для цього вам потрібно передати у http-запиті додатково параметр page.
 
-<!-- No movies found for your request. -->
+Тепер у відповідь бекенду вас буде цікавити не лише властивість results, а і total_page. Тому не забудьте оновити інтерфейс для типізації відповіді з бекенду.
 
-Ця перевірка виконується в App при обробці HTTP-запиту. Для сповіщень використовуйте бібліотеку React Hot Toast.
-При кожному новому пошуку колекція фільмів з попереднього пошуку повинна очищатись.
+Для відображення елементів пагінації використовуйте бібліотеку React Paginate. Зверніть увагу, що вона містить готовий компонент пагінації, але без стилів. Тому додайте підготовлені нами стилі для неї у файл App.module.css:
 
-====================== Галерея фільмів MovieGrid ========
+<!-- .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 16px 0;
+    list-style: none;
+    padding: 0;
+}
 
-Компонент MovieGrid – це список карток фільмів. Він приймає два пропси:
+.pagination li {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+}
 
-<!-- onSelect – функцію для обробки кліку на картку фільму; -->
-<!-- movies – масив фільмів. -->
+.pagination a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
 
-Компонент MovieGrid має створювати DOM-елемент наступної структури:
+.active {
+    background-color: #0a66c2;
+    color: white;
+    font-weight: bold;
+} -->
+
+Зверніть увагу, що є особливість імпорту бібліотеки react-paginate у Vite версії 8+. Для правильного імпорту та типізації використайте наступний код:
 
 <!--
-<ul className={css.grid}>
-  {/* Набір елементів списку з фільмами */}
-  <li>
-    <div className={css.card}>
-      <img
-		    className={css.image}
-		    src="https://image.tmdb.org/t/p/w500/poster-path"
-		    alt="movie title"
-		    loading="lazy"
-		  />
-	    <h2 className={css.title}>Movie title</h2>
-    </div>
-  </li>
-</ul> -->
+import ReactPaginateModule from "react-paginate";
+import type { ReactPaginateProps } from "react-paginate";
+import type { ComponentType } from "react";
 
-Галерея повинна рендеритися лише тоді, коли є які-небудь завантажені фільми.
+type ModuleWithDefault<T> = { default: T };
 
-====================== Індикатор завантаження Loader ========
+const ReactPaginate = (
+  ReactPaginateModule as unknown as ModuleWithDefault<ComponentType<ReactPaginateProps>>
+).default; -->
 
-Компонент Loader має відображатись замість галереї поки відбувається запит за фільмами та створювати DOM-елемент наступної структури:
+// Далі в jsx використовуємо компонент ReactPaginate звичайним чином.
+Компоненту ReactPaginate передайте наступні пропси:
 
-<!-- <p className={css.text}>Loading movies, please wait...</p> -->
+<!-- pageCount={totalPages}
+pageRangeDisplayed={5}
+marginPagesDisplayed={1}
+onPageChange={({ selected }) => setPage(selected + 1)}
+forcePage={page - 1}
+containerClassName={css.pagination}
+activeClassName={css.active}
+nextLabel="→"
+previousLabel="←" -->
 
-====================== Повідомлення про помилку ErrorMessage ========
-
-Компонент ErrorMessage має рендеритися замість галереї фільмів у випадку помилки HTTP-запиту та створювати DOM-елемент наступної структури:
-
-<!-- <p className={css.text}>There was an error, please try again...</p> -->
-
-====================== Модальне вікно MovieModal ========
-
-Під час натискання на зображення галереї повинно відкриватися модальне вікно, яке відображатиме додаткову інформацію про фільм у великому форматі. Створіть для цього компонент MovieModal. Він має використовуватись в компоненті App та отримувати два пропси:
-
-<!-- movie - посилання на об’єкт обраного фільму; -->
-<!-- onClose - функцію закриття модального вікна. -->
-
-Компонент MovieModal має створювати DOM-елемент наступної структури:
-
-<!--
-
-<div className={css.backdrop} role="dialog" aria-modal="true">
-  <div className={css.modal}>
-    <button className={css.closeButton} aria-label="Close modal">
-      &times;
-    </button>
-    <img
-      src="https://image.tmdb.org/t/p/original/backdrop_path"
-      alt="movie_title"
-      className={css.image}
-    />
-    <div className={css.content}>
-      <h2>movie_title</h2>
-      <p>movie_overview</p>
-      <p>
-        <strong>Release Date:</strong> movie_release_date
-      </p>
-      <p>
-        <strong>Rating:</strong> movie_vote_average/10
-      </p>
-    </div>
-  </div>
-</div> -->
-
-Модальне вікно має створюватись через createPortal, щоб рендерити модалку поза межами основного дерева компонентів. Воно має закриватись при кліку на кнопку з хрестиком, натисканні на клавішу ESC та при кліку за межами модального вікна. За допомогою стилів забороніть скролінг тіла сторінки, поки модалка відкрита.
-
-Коли модалка закривається, потрібно обов'язково чистити все, що було змінено чи додано під час її відкриття. Це включає очищення стану обраного фільму, видалення слухачів подій для клавіші Escape та відновлення прокручування тіла сторінки.
-
-======== Увага!========
-При здачі ДЗ в LMS додавайте production URL застосунку.
-На скріні зеленим виділено правильне посилання для здачі.
-Перед здачею обовʼязково перевірте на живій сторінці роботу всього функціоналу.
+Пагінація має рендеритися лише тоді, коли кількість сторінок із завантаженими фільмами більше ніж 1.
 
 <!-- ====================================================== -->
 
