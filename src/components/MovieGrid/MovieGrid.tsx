@@ -2,13 +2,14 @@ import type { Movie } from "../../types/movie";
 import css from "./MovieGrid.module.css";
 
 const API_IMG_URL = "https://image.tmdb.org/t/p/w500";
+const PLACEHOLDER_IMG_URL = "https://placehold.net/default.png";
 
 interface MovieGridProps {
   movies: Movie[];
   onSelect: (movie: Movie) => void;
 }
 
-const MovieGrid = ({ movies, onSelect }: MovieGridProps) => {
+export default function MovieGrid({ movies, onSelect }: MovieGridProps) {
   if (!movies || movies.length === 0) {
     return null;
   }
@@ -17,16 +18,17 @@ const MovieGrid = ({ movies, onSelect }: MovieGridProps) => {
     <ul className={css.grid}>
       {movies.map((movie) => (
         <li key={movie.id}>
-          <div className={css.card} onClick={() => onSelect(movie)}>
+          <div className={css.card}>
             <img
               className={css.image}
               src={
                 movie.poster_path
                   ? `${API_IMG_URL}${movie.poster_path}`
-                  : "https://via.placeholder.com/300x450?text=No+Poster"
+                  : PLACEHOLDER_IMG_URL
               }
               alt={movie.title}
               loading="lazy"
+              onClick={() => onSelect(movie)}
             />
             <h2 className={css.title}>{movie.title}</h2>
           </div>
@@ -34,9 +36,7 @@ const MovieGrid = ({ movies, onSelect }: MovieGridProps) => {
       ))}
     </ul>
   );
-};
-
-export default MovieGrid;
+}
 
 // ===========================================
 // Галерея фільмів MovieGrid

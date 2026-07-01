@@ -2,10 +2,8 @@ import axios from "axios";
 import type { Movie } from "../types/movie";
 
 export interface MoviesData {
-  // page?: number;
   results: Movie[];
   total_pages: number;
-  // total_results?: number;
 }
 
 const API_URL = "https://api.themoviedb.org/3";
@@ -16,7 +14,6 @@ export const fetchMovies = async (
   page: number,
 ): Promise<MoviesData> => {
   try {
-    // --- ВИПРАВЛЕНО БАГ CORS: Використовуємо правильний повний шлях до API ендпоінту search/movie ---
     const response = await axios.get<MoviesData>(`${API_URL}/search/movie`, {
       params: {
         query,
@@ -30,8 +27,6 @@ export const fetchMovies = async (
 
     return response.data;
   } catch (error) {
-    //--- ОПТИМІЗАЦІЯ: Перехоплюємо помилку Axios та прокидаємо стандартний Error для TanStack Query
-    // Додано { cause: error } для суворої вимоги eslint(preserve-caught-error)
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.status_message || error.message, {
         cause: error,

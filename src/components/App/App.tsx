@@ -10,10 +10,24 @@ import {
   useQueryClient,
 } from "@tanstack/react-query"; // Додано useQueryClient
 import { Toaster, toast } from "react-hot-toast";
+
 //--- бібліотека react-paginate у Vite версії 8+(специфіка)
 import ReactPaginateModule from "react-paginate";
 import type { ReactPaginateProps } from "react-paginate";
 import type { ComponentType } from "react";
+
+//=== Імпорт модулів / Components =================
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import Loader from "../Loader/Loader";
+import MovieGrid from "../MovieGrid/MovieGrid";
+import MovieModal from "../MovieModal/MovieModal";
+import SearchBar from "../SearchBar/SearchBar";
+
+//=== Імпорт модулів / SRC =========================
+import { fetchMovies, type MoviesData } from "../../services/movieService";
+import type { Movie } from "../../types/movie";
+
+import css from "./App.module.css";
 
 type ModuleWithDefault<T> = { default: T };
 
@@ -23,96 +37,106 @@ const ReactPaginate = (
   >
 ).default;
 
-//=== Імпорт модулів / Components =================
-import ErrorMessage from "../ErrorMessage/ErrorMessage";
-import Loader from "../Loader/Loader";
-import MovieGrid from "../MovieGrid/MovieGrid";
-import MovieModal from "../MovieModal/MovieModal";
-import SearchBar from "../SearchBar/SearchBar";
-//=== Імпорт модулів / SRC =========================
-import { fetchMovies, type MoviesData } from "../../services/movieService";
-import type { Movie } from "../../types/movie";
-
-import css from "./App.module.css";
-
 function App() {
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  // Доступ до клієнта React Query для миттєвого очищення кешу при порожньому запиті
   const queryClient = useQueryClient();
 
   const { data, isSuccess, isError, error, isFetching, dataUpdatedAt } =
     useQuery<MoviesData>({
       queryKey: ["movies", query, page],
       queryFn: () => fetchMovies(query, page),
-      enabled: query.length > 0, // Ваша базова початкова умова запиту
-      placeholderData: keepPreviousData, // Синтаксис пагінації v5
+      enabled: query.length > 0,
+      placeholderData: keepPreviousData,
     });
 
   const movies: Movie[] = data?.results ?? [];
   const totalPages: number = data?.total_pages ?? 0;
 
-  // --- ВИПРАВЛЕНО: ВАРІАНТ ПОМИЛКИ 1: Якщо користувач відправив порожній інпут (при старті чи повторно)
-  const handleSearch = (newQuery: string): void => {
-    if (newQuery.trim() === "") {
-      toast.error("Please enter your search query.");
-      setQuery(""); // Очищуємо стейт, щоб увімкнути заголовок h5
-      queryClient.removeQueries({ queryKey: ["movies"] }); // Вичищаємо старі результати, щоб сховати сітку фільмів
-      return;
-    }
-    setQuery(newQuery);
-    setPage(1); // Завжди скидаємо сторінку на першу при новому пошуку
-  };
-
-  // --- ВИПРАВЛЕНО: ВАРІАНТ ПОМИЛКИ 2: Помилка, якщо фільмів не знайдено (Toaster)
-  // dataUpdatedAt змушує ефект реагувати на КОЖНУ успішну відповідь від TMDB
+  // ОБРОБКА ПОМИЛОК СЕРВЕРА ТА ПОРОЖНІХ РЕЗУЛЬТАТІВ
   useEffect(() => {
-    if (isSuccess && !isFetching && movies.length === 0 && query !== "") {
+    // Стан помилки №1: Завантаження закінчилось, статус успішний, але масив порожній
+    if (!isFetching && isSuccess && movies.length === 0 && query !== "") {
       toast.error("No movies found for your search query.");
     }
-  }, [isSuccess, isFetching, movies.length, query, dataUpdatedAt]);
 
-  // --- ВИПРАВЛЕНО: ВАРІАНТ ПОМИЛКИ 3: Виведення технічних помилок сервера (502 / CORS)
-  // Оптимізовано умову: прибрано !isFetching, щоб фонове оновлення TanStack Query не блокувало тост
-  useEffect(() => {
-    if (isError && error) {
+    // Стан помилки №2: Завантаження закінчилось технічним збоєм (CORS / 502)
+    if (!isFetching && isError && error) {
       const errorMessage =
         error instanceof Error ? error.message : "Network error";
       toast.error(`Server Error: ${errorMessage}`);
     }
-  }, [isError, error]);
+  }, [
+    isSuccess,
+    isError,
+    isFetching,
+    movies.length,
+    query,
+    error,
+    dataUpdatedAt,
+  ]);
+
+  // Керування пагінацією за допомогою стрілок клавіатури
+  useEffect(() => {
+    if (totalPages <= 1 || selectedMovie) return;
+
+    const handleKeyDown = ({ key }: KeyboardEvent) => {
+      if (key === "ArrowRight") {
+        setPage((prev) => (prev < totalPages ? prev + 1 : prev));
+      } else if (key === "ArrowLeft") {
+        setPage((prev) => (prev > 1 ? prev - 1 : prev));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [totalPages, selectedMovie]);
+
+  // БАЗОВА ЛОГІКА ПОШУКУ
+  const handleSearch = (newQuery: string): void => {
+    const trimmedQuery = newQuery.trim();
+
+    // Стан помилки №3 : Перевіряємо на відправку порожнього запиту
+    if (trimmedQuery === "") {
+      toast.error("Please enter your search query.");
+      setQuery("");
+      setPage(1);
+      queryClient.resetQueries({ queryKey: ["movies"], exact: false });
+      return;
+    }
+
+    setQuery(trimmedQuery);
+    setPage(1);
+  };
 
   const openModal = (movie: Movie): void => {
     setSelectedMovie(movie);
+    document.body.style.overflow = "hidden";
   };
-
   const closeModal = (): void => {
     setSelectedMovie(null);
+    document.body.style.overflow = "unset";
   };
+
+  const ARROW_LEFT_CHAR = "←";
+  const ARROW_RIGHT_CHAR = "→";
 
   return (
     <div className={css.app}>
-      {/* Клієнтський Toaster залізно примонтований на самому верху розмітки App із захистом zIndex */}
+      {/* Налаштування Toaster через zIndex */}
       <Toaster
         position="top-center"
         reverseOrder={false}
-        containerStyle={{
-          top: 24,
-          zIndex: 99999,
-        }}
+        gutter={24}
+        containerStyle={{ zIndex: 99999 }}
       />
-      {/* Передаємо статус завантаження isFetching для блокування кнопки форми від спаму */}
       <SearchBar onSubmit={handleSearch} isLoading={isFetching} />
 
       {isFetching && <Loader />}
-
-      {/* Модульне виведення помилки за допомогою компонента ErrorMessage */}
       {isError && <ErrorMessage />}
 
-      {/* СТАРТОВИЙ ЕКРАН ТА ПОРОЖНІЙ ПОВТОРНИЙ ПОШУК: */}
-      {/* h5 відображається завжди, коли сітка порожня, лоадер завершив роботу і немає помилок */}
       {movies.length === 0 && !isFetching && !isError && (
         <h5 className={css.infoTitle}>
           Enter your query in the search field to get started
@@ -123,7 +147,6 @@ function App() {
         <div className={isFetching ? css.fetching : undefined}>
           <MovieGrid movies={movies} onSelect={openModal} />
 
-          {/* Пагінація має рендеритися лише тоді, коли кількість сторінок із завантаженими фільмами більше ніж 1 */}
           {totalPages > 1 && (
             <ReactPaginate
               pageCount={totalPages}
@@ -133,8 +156,10 @@ function App() {
               forcePage={page - 1}
               containerClassName={css.pagination}
               activeClassName={css.active}
-              nextLabel="→"
-              previousLabel="←"
+              previousClassName={css.prevBtn}
+              nextClassName={css.nextBtn}
+              previousLabel={ARROW_LEFT_CHAR}
+              nextLabel={ARROW_RIGHT_CHAR}
             />
           )}
         </div>
@@ -147,10 +172,10 @@ function App() {
   );
 }
 
-export default App; // Експорт за замовчуванням (вимога ТЗ)
+export default App;
 
 // =======================================================
-// =========== before refactoring and pagination =========
+// ====== HW-04 - before refactoring and pagination ======
 // =======================================================
 //=== Імпорт зовнішніх бібліотек (npm install) ====
 // import { useState } from "react";

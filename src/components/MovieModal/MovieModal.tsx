@@ -3,7 +3,11 @@ import { createPortal } from "react-dom";
 import type { Movie } from "../../types/movie";
 import css from "./MovieModal.module.css";
 
-const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original";
+const IMAGE_MODAL_URL = "https://image.tmdb.org/t/p/original";
+const PLACEHOLDER_IMG_MOD_URL = "https://placehold.net/default.png";
+// "https://placehold.co/" + "600?font=source-sans-pro&text=No+poster";
+// "https://placehold.co/" + "600x400/EEE/31343C?font=oswald&text=No+Poster";
+// "https://placehold.co/" + "600?font=oswald&text=No+Poster";
 
 interface MovieModalProps {
   movie: Movie;
@@ -11,37 +15,55 @@ interface MovieModalProps {
 }
 
 const MovieModal = ({ movie, onClose }: MovieModalProps) => {
+  // Керування життєвим циклом модального вікна та глобальними подіями
   useEffect(() => {
+    // Блокуємо скрол основної сторінки під модалкою
     document.body.style.overflow = "hidden";
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+    // Додаємо обробник події натискання клавіші (KeyboardEvent)
+    // Деструктуруємо подію: витягуємо властивість 'key' (назву клавіші)
+    // Якщо натиснуто клавішу Esc — ініціюємо закриття вікна
+    const handleKeyDown = ({ key }: KeyboardEvent) => {
+      if (key === "Escape") {
         onClose();
       }
     };
 
+    // Вказуємо браузеру, що треба слухати натискання клавіш на всьому екрані
     window.addEventListener("keydown", handleKeyDown);
 
+    // Очищаємо пам'ять при закритті модального вікна (Демонтуванні)
+    // Повертаємо прокрутку сторінки назад у робочий стан
+    // Знімаємо слухача подій, щоб не перевантажувати пам'ять браузера
     return () => {
       document.body.style.overflow = "unset";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose]);
+  }, [onClose]); // Ефект перезапуститься тільки якщо зміниться функція onClose
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
+  // Обробник події кліку миші (MouseEvent) по бекграунду / фоновому зображенню (Backdrop)
+  const handleBackdropClick = ({
+    target,
+    currentTarget,
+  }: React.MouseEvent<HTMLDivElement>) => {
+    // УМОВА: Перевіряємо, чи клікнули саме на темний фон (currentTarget),
+    // а не на біле вікно з контентом всередині нього (target).
+    // Закриваємо модалку тільки при кліку на порожнечу навколо неї
+    if (target === currentTarget) {
       onClose();
     }
   };
 
+  // Використовуємо React Portal, щоб відрендерити модалку прямо в document.body поверх усього додатку
   return createPortal(
     <div
       className={css.backdrop}
-      onClick={handleBackdropClick}
+      onClick={handleBackdropClick} // Вішаємо слухач на подію кліку на фон
       role="dialog"
       aria-modal="true"
     >
       <div className={css.modal}>
+        {/* Подія кліку по кнопці-хрестику для швидкого закриття */}
         <button
           className={css.closeButton}
           onClick={onClose}
@@ -49,11 +71,13 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
         >
           &times;
         </button>
+
+        {/* Перевірка наявності картинки та підстановка заглушки */}
         <img
           src={
             movie.backdrop_path
-              ? `${IMAGE_BASE_URL}${movie.backdrop_path}`
-              : "https://via.placeholder.com/1280x720?text=No+Image"
+              ? `${IMAGE_MODAL_URL}${movie.backdrop_path}`
+              : PLACEHOLDER_IMG_MOD_URL
           }
           alt={movie.title}
           className={css.image}
@@ -70,7 +94,7 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
         </div>
       </div>
     </div>,
-    document.body,
+    document.body, // Цільова точка для порталу в HTML
   );
 };
 
