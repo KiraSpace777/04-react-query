@@ -4,11 +4,7 @@
 
 //=== Імпорт зовнішніх бібліотек (npm install) ====
 import { useEffect, useState } from "react";
-import {
-  useQuery,
-  keepPreviousData,
-  useQueryClient,
-} from "@tanstack/react-query"; // Додано useQueryClient
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Toaster, toast } from "react-hot-toast";
 
 //--- бібліотека react-paginate у Vite версії 8+(специфіка)
@@ -42,8 +38,6 @@ function App() {
   const [page, setPage] = useState<number>(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const queryClient = useQueryClient();
-
   const { data, isSuccess, isError, error, isFetching, dataUpdatedAt } =
     useQuery<MoviesData>({
       queryKey: ["movies", query, page],
@@ -57,13 +51,16 @@ function App() {
 
   // ОБРОБКА ПОМИЛОК СЕРВЕРА ТА ПОРОЖНІХ РЕЗУЛЬТАТІВ
   useEffect(() => {
+    // Якщо зараз іде активне завантаження в мережі або сторінка тільки завантажилась, не видаємо помилки
+    if (query === "" || isFetching) return;
+
     // Стан помилки №1: Завантаження закінчилось, статус успішний, але масив порожній
-    if (!isFetching && isSuccess && movies.length === 0 && query !== "") {
+    if (isSuccess && movies.length === 0) {
       toast.error("No movies found for your search query.");
     }
 
     // Стан помилки №2: Завантаження закінчилось технічним збоєм (CORS / 502)
-    if (!isFetching && isError && error) {
+    if (isError && error) {
       const errorMessage =
         error instanceof Error ? error.message : "Network error";
       toast.error(`Server Error: ${errorMessage}`);
@@ -96,19 +93,14 @@ function App() {
 
   // БАЗОВА ЛОГІКА ПОШУКУ
   const handleSearch = (newQuery: string): void => {
-    const trimmedQuery = newQuery.trim();
-
-    // Стан помилки №3 : Перевіряємо на відправку порожнього запиту
-    if (trimmedQuery === "") {
-      toast.error("Please enter your search query.");
-      setQuery("");
-      setPage(1);
-      queryClient.resetQueries({ queryKey: ["movies"], exact: false });
-      return;
-    }
-
-    setQuery(trimmedQuery);
+    setQuery(newQuery);
     setPage(1);
+
+    // Плавний скрол угору при старті нового пошуку
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const openModal = (movie: Movie): void => {
@@ -171,7 +163,6 @@ function App() {
     </div>
   );
 }
-
 export default App;
 
 // =======================================================

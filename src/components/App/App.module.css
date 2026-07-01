@@ -40,13 +40,7 @@ h5 {
   color: inherit;
 }
 
-/* .active {
-  background-color: #0a66c2;
-  color: white;
-  font-weight: bold;
-} */
-
-/* ======================================================= */
+/* ======================================================= 
 /*  НОВІ СТИЛІ ПІДСВІЧУВАННЯ КНОПКИ-стрілки */
 /* ======================================================= */
 
@@ -59,33 +53,34 @@ h5 {
 }
 
 /* ЕФЕКТ НАВЕДЕННЯ МИШКОЮ */
-.pagination li:hover {
-  background-color: #0a66c2;
+.pagination li:not(.active):hover {
+  background-color: #0052a3;
   color: white;
-  border-color: #0a66c2;
+  border-color: #0052a3;
 }
 
 /* БЕЗПОСЕРЕДНЬО КЛІК МИШКОЮ */
-.pagination li:active {
+.pagination li:not(.active):active {
   background-color: #0052a3;
   transform: scale(0.95);
 }
 
-/* ОЧИЩАЭМО налаштування фокусу мишки */
-.pagination li a:focus {
+/* ОЧИЩАЄМО налаштування фокусу мишки та захищаємо формат активної кнопки */
+.pagination li:not(.active):focus,
+.pagination li:not(.active) a:focus,
+.pagination li:not(.active):active,
+.pagination li:not(.active) a:active {
   outline: none;
+  box-shadow: none;
 }
 
-/* Рамка фокусу з'явиться ТІЛЬКИ якщо користувач гортає сайт клавіатурою (Tab) */
-.pagination li a:focus-visible {
+/* Фокус кнопки з'явиться якщо користувач гортає сайт клавіатурою (Tab) */
+.pagination li.active a:focus-visible {
+  outline: 2px solid white;
+  outline-offset: -4px;
+}
+.pagination li:not(.active) a:focus-visible {
   outline: 2px solid #1683f7;
   outline-offset: 2px;
   border-radius: 4px;
-}
-
-/* БЛОКУВАННЯ ДЛЯ НЕАКТИВНИХ СТРІЛОК */
-:global(.pagination .disabled) {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
 }

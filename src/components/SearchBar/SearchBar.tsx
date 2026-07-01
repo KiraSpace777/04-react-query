@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+import { toast } from "react-hot-toast";
 import css from "./SearchBar.module.css";
 
 interface SearchBarProps {
@@ -6,10 +8,29 @@ interface SearchBarProps {
 }
 
 function SearchBar({ onSubmit, isLoading }: SearchBarProps) {
+  // Створюємо inputRef для фокусування на полі при перезавантаженні
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Автоматично ставимо курсор у поле пошуку при завантаженні сайту
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   // Функція обробки даних після натискання кнопки пошуку або Enter
   const handleAction = (formData: FormData) => {
-    const query = formData.get("query") as string;
-    onSubmit(query ? query.trim() : "");
+    const rawQuery = formData.get("query") as string;
+    const query = rawQuery ? rawQuery.trim() : "";
+
+    // Якщо користувач надсилає порожню форму виводимо помилку і зупиняємо виконання коду
+    if (query === "") {
+      toast.error("Please enter your search query.");
+      return;
+    }
+
+    // Якщо запит від користувача містить дані, повертаємо результат запиту
+    onSubmit(query);
   };
 
   // Відображення (рендеринг) форми пошуку та кнопки на екрані
@@ -26,12 +47,12 @@ function SearchBar({ onSubmit, isLoading }: SearchBarProps) {
         </a>
         <form className={css.form} action={handleAction}>
           <input
+            ref={inputRef} // замість autoFocus
             className={css.input}
             type="text"
             name="query"
             autoComplete="off"
             placeholder="Search movies..."
-            autoFocus // Курсор автоматично стає в поле при відкритті сайту
           />
           {/* Блокування кнопки. Коли йде завантаження (isLoading), кнопка вимикається */}
           <button className={css.button} type="submit" disabled={isLoading}>
@@ -98,5 +119,4 @@ export default SearchBar;
 //     </header>
 //   );
 // }
-
 // export default SearchBar;
